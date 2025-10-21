@@ -1,0 +1,1485 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>대치동 육각형 인재 5점 척도 평가 시스템</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .main-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .header p {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+
+        .content-wrapper {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            min-height: 800px;
+        }
+
+        .chart-section {
+            padding: 40px;
+            background: #f8f9fa;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .chart-container {
+            margin-bottom: 30px;
+        }
+
+        .controls {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .btn {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 20px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 11px;
+            transition: all 0.3s;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .score-display {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .score-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .score-item:last-child {
+            border-bottom: none;
+        }
+
+        .score-label {
+            font-size: 14px;
+            font-weight: 500;
+            color: #2c3e50;
+        }
+
+        .score-value {
+            font-size: 18px;
+            font-weight: bold;
+            padding: 6px 12px;
+            border-radius: 25px;
+            color: white;
+            min-width: 50px;
+            text-align: center;
+            position: relative;
+        }
+
+        .score-value::after {
+            content: '/5';
+            font-size: 12px;
+            opacity: 0.8;
+            margin-left: 2px;
+        }
+
+        .details-section {
+            padding: 0;
+            background: white;
+        }
+
+        .ability-tabs {
+            display: flex;
+            background: #ecf0f1;
+            border-bottom: 1px solid #bdc3c7;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 15px 5px;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            font-size: 11px;
+            font-weight: 500;
+            color: #7f8c8d;
+            transition: all 0.3s;
+            text-align: center;
+            line-height: 1.2;
+        }
+
+        .tab-btn.active {
+            background: white;
+            color: #2c3e50;
+            font-weight: bold;
+        }
+
+        .tab-btn:hover {
+            background: #e8f4f8;
+        }
+
+        .tab-content {
+            display: none;
+            padding: 30px;
+            height: 700px;
+            overflow-y: auto;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .ability-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 3px solid;
+        }
+
+        .ability-icon {
+            font-size: 32px;
+            margin-right: 15px;
+        }
+
+        .ability-title {
+            flex: 1;
+        }
+
+        .ability-title h3 {
+            font-size: 20px;
+            margin-bottom: 5px;
+            color: #2c3e50;
+        }
+
+        .ability-title p {
+            font-size: 14px;
+            color: #7f8c8d;
+        }
+
+        .definition-box {
+            background: #f8f9fa;
+            border-left: 4px solid;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .definition-box h4 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        .definition-box p {
+            color: #34495e;
+            line-height: 1.6;
+            font-size: 14px;
+        }
+
+        .components-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .component-item {
+            background: #fff;
+            border: 1px solid #ecf0f1;
+            border-radius: 8px;
+            padding: 15px;
+        }
+
+        .component-item h5 {
+            color: #2c3e50;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .component-item p {
+            color: #7f8c8d;
+            font-size: 12px;
+            line-height: 1.4;
+        }
+
+        .evaluation-section {
+            margin-top: 25px;
+        }
+
+        .evaluation-section h4 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+
+        .score-range {
+            background: white;
+            border: 1px solid #ecf0f1;
+            border-radius: 8px;
+            margin: 8px 0;
+            overflow: hidden;
+        }
+
+        .score-header {
+            padding: 10px 15px;
+            font-weight: bold;
+            color: white;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+        }
+
+        .score-header .icon {
+            margin-right: 8px;
+            font-size: 14px;
+        }
+
+        .score-body {
+            padding: 12px 15px;
+        }
+
+        .score-body ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .score-body li {
+            margin: 6px 0;
+            padding-left: 20px;
+            position: relative;
+            font-size: 12px;
+            line-height: 1.4;
+            color: #2c3e50;
+        }
+
+        .score-body li:before {
+            content: "▸";
+            position: absolute;
+            left: 0;
+            color: #3498db;
+        }
+
+        /* 각 능력별 색상 */
+        .ability-1 .ability-header { border-color: #e74c3c; }
+        .ability-1 .definition-box { border-color: #e74c3c; }
+        .ability-1 .score-5 { background: #e74c3c; }
+        .ability-1 .score-4 { background: #e67e22; }
+        .ability-1 .score-3 { background: #f39c12; }
+        .ability-1 .score-2 { background: #f1c40f; }
+        .ability-1 .score-1 { background: #95a5a6; }
+
+        .ability-2 .ability-header { border-color: #f39c12; }
+        .ability-2 .definition-box { border-color: #f39c12; }
+        .ability-2 .score-5 { background: #f39c12; }
+        .ability-2 .score-4 { background: #e67e22; }
+        .ability-2 .score-3 { background: #f1c40f; }
+        .ability-2 .score-2 { background: #f7dc6f; }
+        .ability-2 .score-1 { background: #95a5a6; }
+
+        .ability-3 .ability-header { border-color: #f1c40f; }
+        .ability-3 .definition-box { border-color: #f1c40f; }
+        .ability-3 .score-5 { background: #f1c40f; }
+        .ability-3 .score-4 { background: #f7dc6f; }
+        .ability-3 .score-3 { background: #fcf3cf; }
+        .ability-3 .score-2 { background: #f8c471; }
+        .ability-3 .score-1 { background: #95a5a6; }
+
+        .ability-4 .ability-header { border-color: #2ecc71; }
+        .ability-4 .definition-box { border-color: #2ecc71; }
+        .ability-4 .score-5 { background: #2ecc71; }
+        .ability-4 .score-4 { background: #58d68d; }
+        .ability-4 .score-3 { background: #82e0aa; }
+        .ability-4 .score-2 { background: #a9dfbf; }
+        .ability-4 .score-1 { background: #95a5a6; }
+
+        .ability-5 .ability-header { border-color: #3498db; }
+        .ability-5 .definition-box { border-color: #3498db; }
+        .ability-5 .score-5 { background: #3498db; }
+        .ability-5 .score-4 { background: #5dade2; }
+        .ability-5 .score-3 { background: #85c1e9; }
+        .ability-5 .score-2 { background: #aed6f1; }
+        .ability-5 .score-1 { background: #95a5a6; }
+
+        .ability-6 .ability-header { border-color: #9b59b6; }
+        .ability-6 .definition-box { border-color: #9b59b6; }
+        .ability-6 .score-5 { background: #9b59b6; }
+        .ability-6 .score-4 { background: #af7ac5; }
+        .ability-6 .score-3 { background: #c39bd3; }
+        .ability-6 .score-2 { background: #d7bde2; }
+        .ability-6 .score-1 { background: #95a5a6; }
+
+        #radarCanvas {
+            border-radius: 10px;
+            background: white;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        @media (max-width: 1024px) {
+            .content-wrapper {
+                grid-template-columns: 1fr;
+            }
+            
+            .components-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .tab-btn {
+                font-size: 10px;
+                padding: 12px 3px;
+            }
+        }
+
+        .legend-compact {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+            margin-top: 15px;
+            font-size: 12px;
+        }
+
+        .legend-compact-item {
+            display: flex;
+            align-items: center;
+            padding: 8px;
+            background: white;
+            border-radius: 6px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .legend-compact-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+
+        .legend-compact-text {
+            font-size: 11px;
+            color: #2c3e50;
+            font-weight: 500;
+        }
+
+        .scale-indicator {
+            background: white;
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 15px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        }
+
+        .scale-indicator h4 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-size: 14px;
+            text-align: center;
+        }
+
+        .scale-items {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .scale-item {
+            text-align: center;
+            flex: 1;
+        }
+
+        .scale-circle {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            margin: 0 auto 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .scale-label {
+            font-size: 10px;
+            color: #7f8c8d;
+            font-weight: 500;
+        }
+
+        .scale-5 { background: #27ae60; }
+        .scale-4 { background: #2ecc71; }
+        .scale-3 { background: #f39c12; }
+        .scale-2 { background: #e67e22; }
+        .scale-1 { background: #e74c3c; }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <div class="header">
+            <h1>🏆 대치동 상위 0.1% 육각형 인재 5점 척도 평가 시스템</h1>
+            <p>Daechi-dong Top 0.1% Hexagonal Talent 5-Point Scale Assessment System</p>
+        </div>
+
+        <div class="content-wrapper">
+            <!-- 차트 섹션 -->
+            <div class="chart-section">
+                <div class="controls">
+                    <button class="btn" onclick="showProfile('ideal')">이상적 프로필 (5점)</button>
+                    <button class="btn" onclick="showProfile('good')">상위권 (4점)</button>
+                    <button class="btn" onclick="showProfile('average')">중위권 (3점)</button>
+                    <button class="btn" onclick="showProfile('low')">하위권 (2점)</button>
+                    <button class="btn" onclick="showProfile('poor')">개선필요 (1점)</button>
+                    <button class="btn" onclick="showProfile('custom')">맞춤 설정</button>
+                </div>
+
+                <div class="chart-container">
+                    <canvas id="radarCanvas" width="380" height="380"></canvas>
+                </div>
+
+                <div class="legend-compact">
+                    <div class="legend-compact-item">
+                        <div class="legend-compact-color" style="background-color: #e74c3c;"></div>
+                        <div class="legend-compact-text">학습뇌 설계력</div>
+                    </div>
+                    <div class="legend-compact-item">
+                        <div class="legend-compact-color" style="background-color: #f39c12;"></div>
+                        <div class="legend-compact-text">습관 형성력</div>
+                    </div>
+                    <div class="legend-compact-item">
+                        <div class="legend-compact-color" style="background-color: #f1c40f;"></div>
+                        <div class="legend-compact-text">멘탈 관리력</div>
+                    </div>
+                    <div class="legend-compact-item">
+                        <div class="legend-compact-color" style="background-color: #2ecc71;"></div>
+                        <div class="legend-compact-text">자기주도력</div>
+                    </div>
+                    <div class="legend-compact-item">
+                        <div class="legend-compact-color" style="background-color: #3498db;"></div>
+                        <div class="legend-compact-text">학습전략력</div>
+                    </div>
+                    <div class="legend-compact-item">
+                        <div class="legend-compact-color" style="background-color: #9b59b6;"></div>
+                        <div class="legend-compact-text">내적동기력</div>
+                    </div>
+                </div>
+
+                <div class="score-display">
+                    <div class="score-item">
+                        <span class="score-label">학습뇌 설계력</span>
+                        <span class="score-value" id="score1" style="background-color: #27ae60;">5</span>
+                    </div>
+                    <div class="score-item">
+                        <span class="score-label">습관 형성력</span>
+                        <span class="score-value" id="score2" style="background-color: #2ecc71;">4</span>
+                    </div>
+                    <div class="score-item">
+                        <span class="score-label">멘탈 관리력</span>
+                        <span class="score-value" id="score3" style="background-color: #27ae60;">5</span>
+                    </div>
+                    <div class="score-item">
+                        <span class="score-label">자기주도력</span>
+                        <span class="score-value" id="score4" style="background-color: #2ecc71;">4</span>
+                    </div>
+                    <div class="score-item">
+                        <span class="score-label">학습전략력</span>
+                        <span class="score-value" id="score5" style="background-color: #27ae60;">5</span>
+                    </div>
+                    <div class="score-item">
+                        <span class="score-label">내적동기력</span>
+                        <span class="score-value" id="score6" style="background-color: #2ecc71;">4</span>
+                    </div>
+                </div>
+
+                <div class="scale-indicator">
+                    <h4>5점 척도 기준</h4>
+                    <div class="scale-items">
+                        <div class="scale-item">
+                            <div class="scale-circle scale-5">5</div>
+                            <div class="scale-label">최상위<br>0.1%</div>
+                        </div>
+                        <div class="scale-item">
+                            <div class="scale-circle scale-4">4</div>
+                            <div class="scale-label">상위권</div>
+                        </div>
+                        <div class="scale-item">
+                            <div class="scale-circle scale-3">3</div>
+                            <div class="scale-label">중위권</div>
+                        </div>
+                        <div class="scale-item">
+                            <div class="scale-circle scale-2">2</div>
+                            <div class="scale-label">하위권</div>
+                        </div>
+                        <div class="scale-item">
+                            <div class="scale-circle scale-1">1</div>
+                            <div class="scale-label">개선필요</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 상세 정보 섹션 -->
+            <div class="details-section">
+                <div class="ability-tabs">
+                    <button class="tab-btn active" onclick="showTab(1)">학습뇌<br>설계력</button>
+                    <button class="tab-btn" onclick="showTab(2)">습관<br>형성력</button>
+                    <button class="tab-btn" onclick="showTab(3)">멘탈<br>관리력</button>
+                    <button class="tab-btn" onclick="showTab(4)">자기<br>주도력</button>
+                    <button class="tab-btn" onclick="showTab(5)">학습<br>전략력</button>
+                    <button class="tab-btn" onclick="showTab(6)">내적<br>동기력</button>
+                </div>
+
+                <!-- 탭 1: 학습뇌 설계력 -->
+                <div class="tab-content active ability-1" id="tab1">
+                    <div class="ability-header">
+                        <div class="ability-icon">🧠</div>
+                        <div class="ability-title">
+                            <h3>학습뇌 설계력 (Learning Brain Design)</h3>
+                            <p>성공하는 공부 뇌를 설계하고 최적화하는 능력</p>
+                        </div>
+                    </div>
+
+                    <div class="definition-box">
+                        <h4>💡 능력 정의</h4>
+                        <p>성공하는 공부 뇌를 설계하고 최적화하는 능력으로, 학습에 대한 올바른 마인드셋과 효율적인 학습 시스템을 구축하는 역량입니다. '재능'보다 '의식적인 노력'의 중요성을 이해하고 실천하는 능력입니다.</p>
+                    </div>
+
+                    <div class="components-grid">
+                        <div class="component-item">
+                            <h5>🎯 실용지능 활용</h5>
+                            <p>언제, 어디서, 누구에게, 어떻게 학습해야 최대 효과를 얻는지 판단하는 능력</p>
+                        </div>
+                        <div class="component-item">
+                            <h5>⚙️ 학습 시스템 설계</h5>
+                            <p>개인에게 최적화된 학습 환경과 루틴을 구축하는 능력</p>
+                        </div>
+                        <div class="component-item">
+                            <h5>🔍 메타인지 능력</h5>
+                            <p>자신의 학습 과정을 객관적으로 모니터링하고 조절하는 능력</p>
+                        </div>
+                        <div class="component-item">
+                            <h5>📈 성장 마인드셋</h5>
+                            <p>'재능'보다 '노력'의 중요성을 이해하고 실천하는 태도</p>
+                        </div>
+                    </div>
+
+                    <div class="evaluation-section">
+                        <h4>📊 5점 척도 평가 기준</h4>
+                        
+                        <div class="score-range">
+                            <div class="score-header score-5">
+                                <span class="icon">🏆</span>
+                                <span>5점: 최상위 0.1% 수준</span>
+                            </div>
+                            <div class="score-body">
+                                <ul>
+                                    <li>자신만의 완성도 높은 학습 시스템을 보유하고 지속적으로 개선</li>
+                                    <li>학습 목표와 현재 상태를 정확히 파악하여 최적의 학습 전략 수립</li>
+                                    <li>시행착오를 통해 학습법을 스스로 발견하고 발전시킴</li>
+                                    <li>과목별 특성에 맞는 차별화된 학습 접근법 활용</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="score-range">
+                            <div class="score-header score-4">
+                                <span class="icon">🥇</span>
+                                <span>4점: 상위권 수준</span>
+                            </div>
+                            <div class="score-body">
+                                <ul>
+                                    <li>기본적인 학습 시스템을 보유하고 있으나 완성도가 아직 부족</li>
+                                    <li>학습 계획을 세우고 실행하지만 조정 능력이 제한적</li>
+                                    <li>효과적인 학습법을 알고 있으나 일관성 있는 적용에 어려움</li>
+                                    <li>부모나 교사의 도움을 받아 학습 전략 개선</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="score-range">
+                            <div class="score-header score-3">
+                                <span class="icon">📊</span>
+                                <span>3점: 중위권 수준</span>
+                            </div>
+                            <div class="score-body">
+                                <ul>
+                                    <li>학습 계획을 세우지만 실행력이 부족하거나 비체계적</li>
+                                    <li>효과적인 학습법에 대한 이해는 있으나 실제 적용이 미흡</li>
+                                    <li>외부의 지속적인 관리와 피드백 필요</li>
+                                    <li>시험 결과에 따라 학습 방향이 자주 바뀜</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="score-range">
+                            <div class="score-header score-2">
+                                <span class="icon">📈</span>
+                                <span>2점: 하위권 수준</span>
+                            </div>
+                            <div class="score-body">
+                                <ul>
+                                    <li>학습 계획 수립과 실행 모두 체계적이지 못함</li>
+                                    <li>학습 방법에 대한 이해 부족으로 비효율적 학습 반복</li>
+                                    <li>외부 의존도가 높고 자기주도적 학습 능력 부족</li>
+                                    <li>단기적 성과에만 집중하는 경향</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="score-range">
+                            <div class="score-header score-1">
+                                <span class="icon">⚠️</span>
+                                <span>1점: 개선 필요</span>
+                            </div>
+                            <div class="score-body">
+                                <ul>
+                                    <li>학습에 대한 체계적 접근이 전혀 없음</li>
+                                    <li>학습 목표가 불분명하고 계획성 부족</li>
+                                    <li>효과적인 학습법에 대한 관심이나 시도가 없음</li>
+                                    <li>학습 과정에 대한 성찰이나 개선 의지 부족</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 탭 2: 습관 형성력 -->
+                <div class="tab-content ability-2" id="tab2">
+                    <div class="ability-header">
+                        <div class="ability-icon">🔄</div>
+                        <div class="ability-title">
+                            <h3>습관 형성력 (Habit Formation)</h3>
+                            <p>의지에 의존하지 않는 자동화된 학습 루틴 구축 능력</p>
+                        </div>
+                    </div>
+
+                    <div class="definition-box">
+                        <h4>💡 능력 정의</h4>
+                        <p>"하루 3줄의 실천"으로 시작하여 의지에 의존하지 않고도 꾸준히 실행할 수 있는 학습 루틴을 만들고 유지하는 능력입니다. 작은 습관에서 시작하여 점진적으로 확장하는 체계적 접근법이 핵심입니다.</p>
+                    </div>
+
+                    <div class="components-grid">
+                        <div class="component-item">
+                            <h5>🎯 루틴 설계 능력</h5>
+                            <p>개인의 생활 패턴에 맞는 실현 가능한 습관을 설계하는 능력</p>
+                        </div>
+                        <div class="component-item">
+                            <h5>⚡ 지속 실행력</h5>
+                            <p>의지력에 의존하지 않는 자동화된 행동 패턴을 구축하는 능력</p>
+                        </div>
+                        <div class="component-item">
+                            <h5>📈 점진적 확장</h5>
+                            <p>작은 습관에서 시작하여 단계적으로 확장하는 능력</p>
+                        </div>
+                        <div class="component-item">
+                            <h5>🏠 환경 조성</h5>
+                            <p>좋은 습관을 촉진하고 나쁜 습관을 억제하는 환경을 구축하는 능력</p>
+                        </div>
+                    </div>
+
+                    <div class="evaluation-section">
+                        <h4>📊 5점 척도 평가 기준</h4>
+                        
+                        <div class="score-range">
+                            <div class="score-header score-5">
+                                <span class="icon">🏆</span>
+                                <span>5점: 최상위 0.1% 수준</span>
+                            </div>
+                            <div class="score-body">
+                                <ul>
+                                    <li>일일 학습 루틴이 완전히 자동화되어 의지력 없이도 실행</li>
+                                    <li>90일 이상 지속된 안정적인 학습 습관 보유</li>
+                                    <li>새로운 좋은 습관을 체계적으로 추가하고 나쁜 습관을 제거하는 능력</li>
+                                    <li>환경 변화(시험 기간, 휴가 등)에도 흔들리지 않는 핵심 루틴 유지</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="score-range">
+                            <div class="score-header score-4">
+                                <span class="icon">🥇</span>
+                                <span>4점: 상위권 수준</span>
+                            </div>
+                            <div class="score-body">
+                                <ul>
+                                    <li>기본적인 일일 학습 루틴이 있고 대부분 지켜짐 (주 5-6일)</li>
+                                    <li>30-60일 정도 지속된 학습 습관 보유</li>
+                                    <li>간헐적으로 의지력에 의존하지만 전반적으로 안정적</li>
+                                    <li>부모의 최소한의 관리 하에 습관 유지</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="score-range">
+                            <div class="score-header score-3">
+                                <span class="icon">📊</span>
+                                <span>3점: 중위권 수준</span>
+                            </div>
+                            <div class="score-body">
+                                <ul>
+                                    <li>학습 루틴이 있지만 일관성이 부족 (주 3-4일 실행)</li>
+                                    <li>2-4주 정도 지속되다가 중단되는 패턴 반복</li>
+                                    <li>의지력에 크게 의존하며 감정 상태에 따라 실행률 변동</li>
+                                    <li>부모의 지속적인 관리와 격려 필요</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="score-range">
+                            <div class="score-header score-2">
+                                <span class="icon">📈</span>
+                                <span>2점: 하위권 수준</span>
+                            </div>
+                            <div class="score-body">
+                                <ul>
+                                    <li>학습 계획은 세우지만 실행이 불규칙적 (주 1-2일)</li>
+                                    <li>1-2주 정도만 지속되고 쉽게 포기하는 패턴</li>
+                                    <li>외부 압력이나 시험 등의 동기가 있을 때만 실행</li>
+                                    <li>습관보다는 즉흥적인 학습에 의존</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="score-range">
+                            <div class="score-header score-1">
+                                <span class="icon">⚠️</span>
+                                <span>1점: 개선 필요</span>
+                            </div>
+                            <div class="score-body">
+                                <ul>
+                                    <li>일정한 학습 루틴이 전혀 없음</li>
+                                    <li>계획을 세워도 2-3일 이내에 포기</li>
+                                    <li>완전히 외부 압력에만 의존하는 학습 패턴</li>
+                                    <li>습관 형성에 대한 이해나 노력 부족</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 탭 3: 멘탈 관리력 -->
+                <div class="tab-content ability-3" id="tab3">
+                    <div class="ability-header">
+                        <div class="ability-icon">💪</div>
+                        <div class="ability-title">
+                            <h3>멘탈 관리력 (Mental Management)</h3>
+                            <p>흔들리지 않는 공부 멘탈을 키우고 관리하는 능력</p>
+                        </div>
+                    </div>
+
+                    <div class="definition-box">
+                        <h4>💡 능력 정의</h4>
+                        <p>좌절을 이겨내는 감정 코칭과 흔들리지 않는 공부 멘탈을 스스로 키우고 관리하는 능력입니다. 부정적 감정을 건설적으로 전환하고, 스트레스를 성장의 동력으로 활용하는 회복 탄력성이 핵심입니다.</p>
+                    </div>
+
+                    <div class="components-grid">
+                        <div class="component-item">
+                            <h5>🎯 감정 조절 능력</h5>
+                            <p>부정적 감정을 인식하고 건설적으로 전환하는 능력</p>
+                        </div>
+                        <div class="component-item">
+                            <h5>⚡ 스트레스 관리</h5>
+                            <p>학습 스트레스를 적절히 관리하고 활용하는 능력</p>
+                        </div>
+                        <div class="component-item">
+                            <h5>🔄 회복 탄력성</h5>
+                            <p>실패나 좌절에서 빠르게 회복하는 능력</p>
+                        </div>
+                        <div class="component-item">
+                            <h5>🎯 목표 지향적 사고</h5>
+                            <p>장기 목표를 위해 단기적 어려움을 극복하는 의지</p>
+                        </div>
+                    </div>
+
+                    <div class="evaluation-section">
+                        <h4>📊 5점 척도 평가 기준</h4>
+                        
+                        <div class="score-range">
+                            <div class="score-header score-5">
+                                <span class="icon">🏆</span>
+                                <span>5점: 최상위 0.1% 수준</span>
+                            </div>
+                            <div class="score-body">
+                                <ul>
+                                    <li>시험 실패나 성적 하락에도 24시간 내 감정 회복</li>
+                                    <li>스트레스를 성장의 동력으로 전환하는 능력 보유</li>
+                                    <li>자신만의 멘탈 관리 루틴과 방법론 확립</li>
+                                    <li>어려운 상황에서도 학습 집중도 유지</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="score-range">
+                            <div class="score-header score-4">
+                                <span class="icon">🥇</span>
+                                <span>4점: 상위권 수준</span>
+                            </div>
+                            <div class="score-body">
+                                <ul>
+                                    <li>부정적 상황에서 1-3일 내 감정 회복</li>
+                                    <li>기본적인 스트레스 관리 방법 보유</li>
+                                    <li>간헐적으로 부모나 교사의 도움을 받아 멘탈 회복</li>
+                                    <li>대부분의 상황에서 학습 의욕 유지</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="score-range">
+                            <div class="score-header score-3">
+                                <span class="icon">📊</span>
+                                <span>3점: 중위권 수준</span>
+                            </div>
+                            <div class="score-body">
+                                <ul>
+                                    <li>부정적 상황에서 1주일 내 감정 회복</li>
+                                    <li>스트레스 관리 방법이 제한적이고 일관성 부족</li>
+                                    <li>부모나 교사의 지속적인 격려와 상담 필요</li>
+                                    <li>감정 기복에 따라 학습 효율성 변동</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="score-range">
+                            <div class="score-header score-2">
+                                <span class="icon">📈</span>
+                                <span>2점: 하위권 수준</span>
+                            </div>
+                            <div class="score-body">
+                                <ul>
+                                    <li>부정적 상황에서 회복까지 2-4주 소요</li>
+                                    <li>스트레스를 건설적으로 처리하지 못하고 회피하는 경향</li>
+                                    <li>외부의 전문적인 도움 없이는 멘탈 관리 어려움</li>
+                                    <li>감정 상태가 학습에 직접적으로 큰 영향</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="score-range">
+                            <div class="score-header score-1">
+                                <span class="icon">⚠️</span>
+                                <span>1점: 개선 필요</span>
+                            </div>
+                            <div class="score-body">
+                                <ul>
+                                    <li>부정적 상황에서 장기간 회복 불가</li>
+                                    <li>스트레스나 실패를 전혀 처리하지 못함</li>
+                                    <li>학습에 대한 의욕 상실 상태가 지속</li>
+                                    <li>전문적인 심리 상담이나 치료 필요</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 탭 4: 자기주도력 -->
+                <div class="tab-content ability-4" id="tab4">
+                    <div class="ability-header">
+                        <div class="ability-icon">🎯</div>
+                        <div class="ability-title">
+                            <h3>자기주도력 (Self-Direction)</h3>
+                            <p>독서력과 콘텐츠 활용을 통한 자기주도 학습 능력</p>
+                        </div>
+                    </div>
+
+                    <div class="definition-box">
+                        <h4>💡 능력 정의</h4>
+                        <p>독서력과 인강 활용력을 바탕으로 스스로 학습을 계획하고 실행하며, 자신만의 학습 콘텐츠를 효과적으로 활용하는 능력입니다. 외부 도움 없이 독립적으로 학습을 설계하고 실행하는 능력이 핵심입니다.</p>
+                    </div>
+
+                    <div class="components-grid">
+                        <div class="component-item">
+                            <h5>📋 독립적 학습 계획</h5>
+                            <p>외부 도움 없이 학습 목표와 계획을 수립하는 능력</p>
+                        </div>
+                        <div class="component-item">
+                            <h5>📚 콘텐츠 활용 능력</h5>
+                            <p>도서, 인강, 온라인 자료를 효과적으로 선별하고 활용하는 능력</p>
+                        </div>
+                        <div class="component-item">
+                            <h5>🔍 자기 평가 능력</h5>
+                            <p>학습 성과를 객관적으로 평가하고 개선점을 도출하는 능력</p>
+                        </div>
+                        <div class="component-item">
+                            <h5>⚡ 능동적 학습</h5>
+                            <p>수동적 수업 참여를 넘어 능동적으로 지식을 탐구하는 능력</p>
+                        </div>
+                    </div>
+
+                    <div class="evaluation-section">
+                        <h4>📊 5점 척도 평가 기준</h4>
+                        
+                        <div class="score-range">
+                            <div class="score-header score-5">
+                                <span class="icon">🏆</span>
+                                <span>5점: 최상위 0.1% 수준</span>
+                            </div>
+                            <div class="score-body">
+                                <ul>
+                                    <li>완전히 독립적인 학습 계획 수립과 실행</li>
+                                    <li>다양한 학습 콘텐츠를 자유자재로 선별하고 조합하여 활용</li>
+                                    <li>자신의 학습 상태를 정확히 진단하고 맞춤형 솔루션 개발</li>
+                                    <li>교사나 부모보다 더 엄격한 자기 평가 기준 적용</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="score-range">
+                            <div class="score-header score-4">
+                                <span class="icon">🥇</span>
+                                <span>4점: 상위권 수준</span>
+                            </div>
+                            <div class="score-body">
+                                <ul>
+                                    <li>기본적인 학습 계획을 독립적으로 수립</li>
+                                    <li>적절한 학습 콘텐츠 선택과 활용 능력 보유</li>
+                                    <li>자기 평가를 통해 학습 방향 조정 가능</li>
+                                    <li>부모의 최소한의 가이드라인 하에 자기주도 학습</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="score-range">
+                            <div class="score-header score-3">
+                                <span class="icon">📊</span>
+                                <span>3점: 중위권 수준</span>
+                            </div>
+                            <div class="score-body">
+                                <ul>
+                                    <li>제공된 틀 안에서 학습 계획 수립</li>
+                                    <li>추천받은 콘텐츠를 활용하지만 자율적 선별 능력 부족</li>
+                                    <li>외부 피드백을 통해서만 학습 상태 파악 가능</li>
+                                    <li>부모의 지속적인 관리와 방향 제시 필요</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="score-range">
+                            <div class="score-header score-2">
+                                <span class="icon">📈</span>
+                                <span>2점: 하위권 수준</span>
+                            </div>
+                            <div class="score-body">
+                                <ul>
+                                    <li>외부에서 제공하는 학습 계획에만 의존</li>
+                                    <li>지정된 콘텐츠만 수동적으로 활용</li>
+                                    <li>자기 평가 능력이 매우 제한적</li>
+                                    <li>학습의 모든 과정에서 외부 지시와 관리 필요</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="score-range">
+                            <div class="score-header score-1">
+                                <span class="icon">⚠️</span>
+                                <span>1점: 개선 필요</span>
+                            </div>
+                            <div class="score-body">
+                                <ul>
+                                    <li>학습 계획 수립 능력 전혀 없음</li>
+                                    <li>콘텐츠 활용 방법을 모르거나 무관심</li>
+                                    <li>자신의 학습 상태에 대한 인식 부족</li>
+                                    <li>완전한 타율 학습 상태</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 탭 5: 학습전략력 -->
+                <div class="tab-content ability-5" id="tab5">
+                    <div class="ability-header">
+                        <div class="ability-icon">🧩</div>
+                        <div class="ability-title">
+                            <h3>학습전략력 (Learning Strategy)</h3>
+                            <p>암기와 이해를 넘나드는 전략적 학습 능력</p>
+                        </div>
+                    </div>
+
+                    <div class="definition-box">
+                        <h4>💡 능력 정의</h4>
+                        <p>모든 과목에 적용되는 '무지개암기법'과 이해형·암기형 아이별 맞춤 접근을 통해 암기와 이해의 경계를 넘나드는 전략적 학습 능력입니다. 과목별 특성에 맞는 최적화된 학습 전략을 개발하고 적용하는 능력이 핵심입니다.</p>
+                    </div>
+
+                    <div class="components-grid">
+                        <div class="component-item">
+                            <h5>🔗 통합적 학습법</h5>
+                            <p>암기와 이해를 유기적으로 연결하는 학습 전략</p>
+                        </div>
+                        <div class="component-item">
+                            <h5>📚 과목별 맞춤 전략</h5>
+                            <p>각 과목의 특성에 맞는 차별화된 학습 접근법</p>
+                        </div>
+                        <div class="component-item">
+                            <h5>⚡ 효율성 추구</h5>
+                            <p>최소 시간으로 최대 효과를 내는 학습 기법</p>
+                        </div>
+                        <div class="component-item">
+                            <h5>🔄 전이 능력</h5>
+                            <p>한 과목에서 학습한 전략을 다른 과목에 응용하는 능력</p>
+                        </div>
+                    </div>
+
+                    <div class="evaluation-section">
+                        <h4>📊 5점 척도 평가 기준</h4>
+                        
+                        <div class="score-range">
+                            <div class="score-header score-5">
+                                <span class="icon">🏆</span>
+                                <span>5점: 최상위 0.1% 수준</span>
+                            </div>
+                            <div class="score-body">
+                                <ul>
+                                    <li>모든 과목에서 암기와 이해를 완벽하게 통합한 학습법 활용</li>
+                                    <li>과목별 특성을 정확히 파악하여 최적화된 전략 적용</li>
+                                    <li>새로운 과목이나 단원에서도 빠르게 효과적인 학습법 개발</li>
+                                    <li>다른 학생들에게 학습법을 가르칠 수 있는 수준의 전문성</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="score-range">
+                            <div class="score-header score-4">
+                                <span class="icon">🥇</span>
+                                <span>4점: 상위권 수준</span>
+                            </div>
+                            <div class="score-body">
+                                <ul>
+                                    <li>주요 과목에서 효과적인 학습 전략 보유</li>
+                                    <li>암기와 이해의 균형을 어느 정도 맞춘 학습법 활용</li>
+                                    <li>과목별 차이를 인식하고 기본적인 맞춤형 접근</li>
+                                    <li>학습 효율성에 대한 의식적인 고민과 개선 노력</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="score-range">
+                            <div class="score-header score-3">
+                                <span class="icon">📊</span>
+                                <span>3점: 중위권 수준</span>
+                            </div>
+                            <div class="score-body">
+                                <ul>
+                                    <li>일부 과목에서만 체계적인 학습 전략 보유</li>
+                                    <li>암기 위주 또는 이해 위주의 편향된 학습 패턴</li>
+                                    <li>과목별 특성을 일부 인식하지만 적용이 미흡</li>
+                                    <li>학습 전략에 대한 기본적인 이해는 있으나 실행력 부족</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="score-range">
+                            <div class="score-header score-2">
+                                <span class="icon">📈</span>
+                                <span>2점: 하위권 수준</span>
+                            </div>
+                            <div class="score-body">
+                                <ul>
+                                    <li>학습 전략이 매우 제한적이고 비체계적</li>
+                                    <li>암기와 이해를 분리하여 접근하는 경향</li>
+                                    <li>과목별 차이를 거의 인식하지 못함</li>
+                                    <li>비효율적인 학습 방법을 반복하는 패턴</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="score-range">
+                            <div class="score-header score-1">
+                                <span class="icon">⚠️</span>
+                                <span>1점: 개선 필요</span>
+                            </div>
+                            <div class="score-body">
+                                <ul>
+                                    <li>체계적인 학습 전략이 전혀 없음</li>
+                                    <li>단순 반복 학습에만 의존</li>
+                                    <li>과목의 특성이나 효율성에 대한 고려 부족</li>
+                                    <li>전략적 사고 없이 무작정 시간 투입</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 탭 6: 내적동기력 -->
+                <div class="tab-content ability-6" id="tab6">
+                    <div class="ability-header">
+                        <div class="ability-icon">🔥</div>
+                        <div class="ability-title">
+                            <h3>내적동기력 (Intrinsic Motivation)</h3>
+                            <p>내면에서 끌어올리는 자기동기 부여 능력</p>
+                        </div>
+                    </div>
+
+                    <div class="definition-box">
+                        <h4>💡 능력 정의</h4>
+                        <p>칭찬보다 더 강력한 '인정 욕구'를 자극하여 내면에서 끌어올리는 자기동기 부여 능력과 지속가능한 목표 설정 능력입니다. 외부 보상에 의존하지 않고 학습 자체에서 만족감을 얻는 능력이 핵심입니다.</p>
+                    </div>
+
+                    <div class="components-grid">
+                        <div class="component-item">
+                            <h5>💎 내재적 동기 개발</h5>
+                            <p>외부 보상이 아닌 내적 만족을 통한 동기 부여</p>
+                        </div>
+                        <div class="component-item">
+                            <h5>🎯 장기 목표 설정</h5>
+                            <p>현실적이면서도 도전적인 장기 비전 수립</p>
+                        </div>
+                        <div class="component-item">
+                            <h5>✨ 성취감 관리</h5>
+                            <p>작은 성공을 통해 지속적인 동기를 유지하는 능력</p>
+                        </div>
+                        <div class="component-item">
+                            <h5>🏆 자아 정체성</h5>
+                            <p>학습을 통한 자아실현과 정체성 형성</p>
+                        </div>
+                    </div>
+
+                    <div class="evaluation-section">
+                        <h4>📊 5점 척도 평가 기준</h4>
+                        
+                        <div class="score-range">
+                            <div class="score-header score-5">
+                                <span class="icon">🏆</span>
+                                <span>5점: 최상위 0.1% 수준</span>
+                            </div>
+                            <div class="score-body">
+                                <ul>
+                                    <li>외부 보상 없이도 학습에 대한 강력한 내적 동기 보유</li>
+                                    <li>명확하고 구체적인 장기 목표와 이를 달성하기 위한 로드맵 수립</li>
+                                    <li>작은 성취에서도 깊은 만족감을 느끼고 이를 다음 동기로 연결</li>
+                                    <li>학습을 자아실현의 수단으로 인식하는 성숙한 정체성</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="score-range">
+                            <div class="score-header score-4">
+                                <span class="icon">🥇</span>
+                                <span>4점: 상위권 수준</span>
+                            </div>
+                            <div class="score-body">
+                                <ul>
+                                    <li>기본적인 내적 동기를 보유하되 간헐적으로 외부 자극 필요</li>
+                                    <li>장기 목표가 있지만 구체성이나 현실성이 다소 부족</li>
+                                    <li>성취에 대한 만족감이 있으나 지속력이 제한적</li>
+                                    <li>학습의 의미에 대한 이해는 있으나 일관성 부족</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="score-range">
+                            <div class="score-header score-3">
+                                <span class="icon">📊</span>
+                                <span>3점: 중위권 수준</span>
+                            </div>
+                            <div class="score-body">
+                                <ul>
+                                    <li>내적 동기와 외적 동기가 혼재되어 있는 상태</li>
+                                    <li>막연한 장기 목표는 있으나 구체적인 계획 부족</li>
+                                    <li>외부 인정이나 보상이 주요 동기 요인</li>
+                                    <li>학습의 목적이 불분명하거나 자주 변함</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="score-range">
+                            <div class="score-header score-2">
+                                <span class="icon">📈</span>
+                                <span>2점: 하위권 수준</span>
+                            </div>
+                            <div class="score-body">
+                                <ul>
+                                    <li>주로 외부 압력이나 강제에 의한 학습 동기</li>
+                                    <li>장기 목표가 없거나 매우 모호함</li>
+                                    <li>즉각적인 보상이나 처벌에만 반응</li>
+                                    <li>학습을 의무나 부담으로 인식</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="score-range">
+                            <div class="score-header score-1">
+                                <span class="icon">⚠️</span>
+                                <span>1점: 개선 필요</span>
+                            </div>
+                            <div class="score-body">
+                                <ul>
+                                    <li>학습에 대한 동기가 거의 없는 상태</li>
+                                    <li>목표 의식이 전혀 없음</li>
+                                    <li>외부 압력에도 반응하지 않는 무기력 상태</li>
+                                    <li>학습을 완전히 거부하거나 회피하는 패턴</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('radarCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        const abilities = [
+            '학습뇌 설계력',
+            '습관 형성력', 
+            '멘탈 관리력',
+            '자기주도력',
+            '학습전략력',
+            '내적동기력'
+        ];
+        
+        const colors = ['#e74c3c', '#f39c12', '#f1c40f', '#2ecc71', '#3498db', '#9b59b6'];
+        
+        let currentValues = [5, 4, 5, 4, 5, 4];
+
+        // 5점 척도 색상 매핑
+        function getScoreColor(score) {
+            switch(score) {
+                case 5: return '#27ae60';
+                case 4: return '#2ecc71'; 
+                case 3: return '#f39c12';
+                case 2: return '#e67e22';
+                case 1: return '#e74c3c';
+                default: return '#95a5a6';
+            }
+        }
+
+        // 육각형의 꼭짓점 계산 함수
+        function getHexagonPoint(centerX, centerY, radius, index) {
+            const angle = (Math.PI / 3) * index - Math.PI / 2;
+            return {
+                x: centerX + Math.cos(angle) * radius,
+                y: centerY + Math.sin(angle) * radius
+            };
+        }
+        
+        // 육각형 그리기 함수
+        function drawHexagon(centerX, centerY, radius, strokeStyle, lineWidth, fillStyle = null) {
+            ctx.beginPath();
+            for (let i = 0; i < 6; i++) {
+                const point = getHexagonPoint(centerX, centerY, radius, i);
+                if (i === 0) {
+                    ctx.moveTo(point.x, point.y);
+                } else {
+                    ctx.lineTo(point.x, point.y);
+                }
+            }
+            ctx.closePath();
+            
+            if (fillStyle) {
+                ctx.fillStyle = fillStyle;
+                ctx.fill();
+            }
+            
+            ctx.strokeStyle = strokeStyle;
+            ctx.lineWidth = lineWidth;
+            ctx.stroke();
+        }
+        
+        function drawRadarChart(values) {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            const maxRadius = 140;
+            const levels = 5;
+            
+            // 육각형 격자 그리기 (5단계)
+            ctx.strokeStyle = '#e8e8e8';
+            ctx.lineWidth = 1;
+            for (let i = 1; i <= levels; i++) {
+                const radius = (maxRadius / levels) * i;
+                drawHexagon(centerX, centerY, radius, '#e8e8e8', 1);
+            }
+            
+            // 중심에서 각 꼭짓점으로 가는 선 그리기
+            ctx.strokeStyle = '#d0d0d0';
+            ctx.lineWidth = 1;
+            for (let i = 0; i < 6; i++) {
+                const point = getHexagonPoint(centerX, centerY, maxRadius, i);
+                ctx.beginPath();
+                ctx.moveTo(centerX, centerY);
+                ctx.lineTo(point.x, point.y);
+                ctx.stroke();
+            }
+            
+            // 능력명 라벨 그리기
+            ctx.font = 'bold 11px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            
+            for (let i = 0; i < 6; i++) {
+                const labelPoint = getHexagonPoint(centerX, centerY, maxRadius + 30, i);
+                ctx.fillStyle = colors[i];
+                
+                let adjustedX = labelPoint.x;
+                let adjustedY = labelPoint.y;
+                
+                if (i === 0) adjustedY -= 3;
+                else if (i === 1) adjustedX += 8;
+                else if (i === 2) adjustedX += 8;
+                else if (i === 3) adjustedY += 3;
+                else if (i === 4) adjustedX -= 8;
+                else if (i === 5) adjustedX -= 8;
+                
+                ctx.fillText(abilities[i], adjustedX, adjustedY);
+            }
+            
+            // 데이터 육각형 그리기 (5점 척도 기준)
+            const dataPoints = [];
+            for (let i = 0; i < 6; i++) {
+                const value = values[i] / 5; // 5점 척도로 정규화
+                const point = getHexagonPoint(centerX, centerY, maxRadius * value, i);
+                dataPoints.push(point);
+            }
+            
+            // 데이터 육각형 채우기
+            ctx.beginPath();
+            for (let i = 0; i < dataPoints.length; i++) {
+                if (i === 0) {
+                    ctx.moveTo(dataPoints[i].x, dataPoints[i].y);
+                } else {
+                    ctx.lineTo(dataPoints[i].x, dataPoints[i].y);
+                }
+            }
+            ctx.closePath();
+            
+            const gradient = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, maxRadius);
+            gradient.addColorStop(0, 'rgba(102, 126, 234, 0.4)');
+            gradient.addColorStop(0.7, 'rgba(118, 75, 162, 0.2)');
+            gradient.addColorStop(1, 'rgba(118, 75, 162, 0.05)');
+            ctx.fillStyle = gradient;
+            ctx.fill();
+            
+            ctx.strokeStyle = '#667eea';
+            ctx.lineWidth = 3;
+            ctx.stroke();
+            
+            // 데이터 포인트 그리기
+            for (let i = 0; i < dataPoints.length; i++) {
+                ctx.beginPath();
+                ctx.arc(dataPoints[i].x, dataPoints[i].y, 6, 0, 2 * Math.PI);
+                ctx.fillStyle = colors[i];
+                ctx.fill();
+                ctx.strokeStyle = 'white';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+            }
+            
+            // 레벨 표시 (1-5점)
+            ctx.fillStyle = '#95a5a6';
+            ctx.font = '10px sans-serif';
+            ctx.textAlign = 'left';
+            
+            for (let i = 1; i <= levels; i++) {
+                const radius = (maxRadius / levels) * i;
+                const point = getHexagonPoint(centerX, centerY, radius, 1);
+                ctx.fillText(i.toString(), point.x + 12, point.y - 8);
+            }
+            
+            drawHexagon(centerX, centerY, 6, '#667eea', 2, '#667eea');
+        }
+
+        function updateScoreDisplay(values) {
+            for (let i = 0; i < 6; i++) {
+                const scoreElement = document.getElementById(`score${i+1}`);
+                scoreElement.textContent = values[i];
+                scoreElement.style.backgroundColor = getScoreColor(values[i]);
+            }
+            currentValues = [...values];
+        }
+        
+        function showProfile(type) {
+            let values;
+            switch(type) {
+                case 'ideal':
+                    values = [5, 4, 5, 4, 5, 4];
+                    break;
+                case 'good':
+                    values = [4, 4, 4, 4, 4, 4];
+                    break;
+                case 'average':
+                    values = [3, 3, 3, 3, 3, 3];
+                    break;
+                case 'low':
+                    values = [2, 2, 2, 2, 2, 2];
+                    break;
+                case 'poor':
+                    values = [1, 1, 1, 1, 1, 1];
+                    break;
+                case 'custom':
+                    values = [4, 3, 4, 3, 3, 4];
+                    break;
+                default:
+                    values = [5, 4, 5, 4, 5, 4];
+            }
+            drawRadarChart(values);
+            updateScoreDisplay(values);
+        }
+        
+        function showTab(tabNumber) {
+            // 모든 탭 비활성화
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            
+            // 선택된 탭 활성화
+            document.querySelector(`.tab-btn:nth-child(${tabNumber})`).classList.add('active');
+            document.getElementById(`tab${tabNumber}`).classList.add('active');
+        }
+        
+        // 초기 차트 표시
+        showProfile('ideal');
+    </script>
+</body>
+</html>
